@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Click a Button</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ffffff 0%, #e9dcff 45%, #8b5cf6 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    color: #5b21b6;
+    font-size: 2.2rem;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+
+  p.subtitle {
+    color: #7c3aed;
+    margin-bottom: 30px;
+    font-size: 1rem;
+  }
+
+  .name-box {
+    background: #ffffff;
+    border: 2px solid #a855f7;
+    border-radius: 15px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    color: #5b21b6;
+    width: 240px;
+    text-align: center;
+    outline: none;
+  }
+
+  .name-box.error {
+    border-color: #dc2626;
+  }
+
+  .name-box::placeholder {
+    color: #c4b5fd;
+  }
+
+  #nameError {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    min-height: 18px;
+  }
+
+  .score-card {
+    background: #ffffff;
+    border: 2px solid #a855f7;
+    border-radius: 20px;
+    padding: 25px 50px;
+    margin: 20px 0 30px;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
+    transition: transform 0.15s ease;
+  }
+
+  .score-card.bump {
+    animation: bump 0.25s ease;
+  }
+
+  @keyframes bump {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+
+  .score-label {
+    color: #7c3aed;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  #score {
+    color: #5b21b6;
+    font-size: 3.5rem;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+
+  .button-wrap {
+    position: relative;
+    width: 220px;
+    height: 220px;
+  }
+
+  /* Modified button styles: Removed image requirement and made a perfect, clean purple sphere */
+  #clickBtn {
+    width: 180px;
+    height: 180px;
+    border: none;
+    background: linear-gradient(135deg, #a855f7 0%, #6d28d9 100%);
+    border-radius: 50%;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 25px rgba(109, 40, 217, 0.5), inset 0 4px 8px rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+
+  #clickBtn.pressed {
+    transform: translate(-50%, -50%) scale(0.9);
+    box-shadow: 0 5px 12px rgba(109, 40, 217, 0.4);
+  }
+
+  .ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 4px solid #a855f7;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0.8;
+    pointer-events: none;
+    animation: rippleOut 0.5s ease-out forwards;
+    z-index: 1;
+  }
+
+  @keyframes rippleOut {
+    to {
+      transform: translate(-50%, -50%) scale(1.4);
+      opacity: 0;
+    }
+  }
+
+  .float-point {
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    color: #6d28d9;
+    font-weight: bold;
+    font-size: 1.8rem;
+    pointer-events: none;
+    transform: translate(-50%, 0);
+    animation: floatUp 0.7s ease-out forwards;
+    z-index: 3;
+  }
+
+  @keyframes floatUp {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -70px);
+    }
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  #resetBtn, #saveBtn {
+    background: none;
+    border: 2px solid #a855f7;
+    color: #7c3aed;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  #saveBtn {
+    background: #7c3aed;
+    color: #fff;
+  }
+
+  #resetBtn:hover {
+    background: #a855f7;
+    color: #fff;
+  }
+
+  #saveBtn:hover {
+    background: #5b21b6;
+  }
+
+  .leaderboard {
+    background: #ffffff;
+    border: 2px solid #a855f7;
+    border-radius: 20px;
+    padding: 20px 30px;
+    margin-top: 40px;
+    width: 280px;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
+  }
+
+  .leaderboard h2 {
+    color: #5b21b6;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+  }
+
+  #leaderList {
+    list-style: none;
+    text-align: left;
+  }
+
+  #leaderList li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #ede9fe;
+    color: #5b21b6;
+    font-size: 0.95rem;
+  }
+
+  #leaderList li:last-child {
+    border-bottom: none;
+  }
+
+  #leaderList .rank {
+    color: #a855f7;
+    font-weight: bold;
+    margin-right: 8px;
+  }
+
+  #leaderList .empty {
+    color: #c4b5fd;
+    font-style: italic;
+    justify-content: center;
+  }
+
+  footer {
+    margin: 50px 0 20px;
+    color: #6d28d9;
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+</style>
+</head>
+<body>
+
+  <h1>Click a Button</h1>
+  <p class="subtitle">Tap the button below to score points!</p>
+
+  <input type="text" id="playerName" class="name-box" placeholder="Enter your name" maxlength="15">
+  <div id="nameError"></div>
+
+  <div class="score-card" id="scoreCard">
+    <div class="score-label">Score</div>
+    <div id="score">0</div>
+  </div>
+
+  <div class="button-wrap" id="buttonWrap">
+    <!-- Cleaned up: Removed img tag entirely, text is handled cleanly inside code now -->
+    <button id="clickBtn">TAP!</button>
+  </div>
+
+  <div class="btn-row">
+    <button id="saveBtn">Save Score</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <div class="leaderboard">
+    <h2>🏆 Leaderboard</h2>
+    <ul id="leaderList"></ul>
+  </div>
+
+  <audio id="clickSound" src="faaaa.mp3" preload="auto"></audio>
+
+  <footer>Create by shahadad</footer>
+
+  <script>
+    let score = 0;
+    const scoreEl = document.getElementById('score');
+    const scoreCard = document.getElementById('scoreCard');
+    const clickBtn = document.getElementById('clickBtn');
+    const buttonWrap = document.getElementById('buttonWrap');
+    const resetBtn = document.getElementById('resetBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const clickSound = document.getElementById('clickSound');
+    const playerName = document.getElementById('playerName');
+    const leaderList = document.getElementById('leaderList');
+    const nameError = document.getElementById('nameError');
+
+    function getLeaderboard() {
+      const data = localStorage.getItem('leaderboard');
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveLeaderboard(list) {
+      localStorage.setItem('leaderboard', JSON.stringify(list));
+    }
+
+    function isNameTaken(name) {
+      const list = getLeaderboard();
+      return list.some(entry => entry.name.toLowerCase() === name.toLowerCase());
+    }
+
+    function renderLeaderboard() {
+      const list = getLeaderboard();
+      leaderList.innerHTML = '';
+
+      if (list.length === 0) {
+        leaderList.innerHTML = '<li class="empty">No scores yet</li>';
+        return;
+      }
+
+      list.forEach((entry, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span><span class="rank">#${i + 1}</span>${entry.name}</span><span>${entry.score}</span>`;
+        leaderList.appendChild(li);
+      });
+    }
+
+    function spawnRipple() {
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple';
+      buttonWrap.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 500);
+    }
+
+    function spawnFloatPoint() {
+      const pt = document.createElement('div');
+      pt.className = 'float-point';
+      pt.textContent = '+1';
+      pt.style.left = (45 + Math.random() * 10) + '%';
+      buttonWrap.appendChild(pt);
+      setTimeout(() => pt.remove(), 700);
+    }
+
+    clickBtn.addEventListener('click', () => {
+      score++;
+      scoreEl.textContent = score;
+
+      clickSound.currentTime = 0;
+      clickSound.play();
+
+      // button press animation
+      clickBtn.classList.add('pressed');
+      setTimeout(() => clickBtn.classList.remove('pressed'), 120);
+
+      // score card bump animation
+      scoreCard.classList.remove('bump');
+      void scoreCard.offsetWidth; // restart animation trick
+      scoreCard.classList.add('bump');
+
+      // ripple + floating point
+      spawnRipple();
+      spawnFloatPoint();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      score = 0;
+      scoreEl.textContent = score;
+    });
+
+    playerName.addEventListener('input', () => {
+      nameError.textContent = '';
+      playerName.classList.remove('error');
+    });
+
+    saveBtn.addEventListener('click', () => {
+      const name = playerName.value.trim();
+
+      if (!name) {
+        nameError.textContent = 'Please enter a name';
+        playerName.classList.add('error');
+        return;
+      }
+
+      if (isNameTaken(name)) {
+        nameError.textContent = 'This name is already used';
+        playerName.classList.add('error');
+        return;
+      }
+
+      let list = getLeaderboard();
+      list.push({ name: name, score: score });
+      list.sort((a, b) => b.score - a.score);
+      list = list.slice(0, 10);
+
+      saveLeaderboard(list);
+      renderLeaderboard();
+
+      nameError.textContent = '';
+      playerName.classList.remove('error');
+      playerName.disabled = true;
+    });
+
+    renderLeaderboard();
+  </script>
+
+</body>
+</html>
+
+
